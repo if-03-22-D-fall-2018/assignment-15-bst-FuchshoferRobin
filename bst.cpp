@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include "general.h"
 
-
 struct Node
 {
   int value;
@@ -29,46 +28,85 @@ Bst new_bst()
 
 void delete_bst(Bst bst)
 {
-  if(bst==0)return;
-  sfree(bst);
+  if(bst != 0)
+  {
+    if (bst->left != 0)
+    {
+      sfree(bst->left);
+    }
+    if (bst->right != 0)
+    {
+      sfree(bst->right);
+    }
+    sfree(bst);
+  }
 }
 
 
 int get_depth(Bst bst)
 {
-  if(bst==0)return 0;
-  return1;
+  if(bst == 0)
+  {
+      return 0;
+  }
+  else
+  {
+    int lchild = get_depth(bst->left);
+    int rchild = get_depth(bst->right);
+
+    if(lchild <= rchild)
+    {
+      return rchild+1;
+    }
+    else
+    {
+      return lchild+1;
+    }
+  }
 }
 
 
 void add(Bst* bst, int value)
 {
-  Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-  newNode->value = value;
-  newNode->left_subtree = 0;
-  newNode->right_subtree = 0;
-
-  if(*bst == 0)
+  Bst new_node = (Bst)malloc(sizeof(struct Node));
+  new_node->value = value;
+  new_node->left = 0;
+  new_node->right = 0;
+  if (*bst == 0)
   {
-    *bst = newNode;
+    *bst = new_node;
+    return;
   }
+  if (value <= (*bst)->value)
+  {
+    (*bst)->left = new_node;
+  }
+  else
+  {
+    (*bst)->right = new_node;
+  }
+
 
 
 }
 
 int root_value(Bst bst)
 {
-  return 0;
+  if (bst == 0 )return 0;
+  return bst->value;
 }
 
 Bst left_subtree(Bst root)
 {
-  return 0;
+  if (root == 0)return 0;
+  return root->left;
 }
 
 Bst right_subtree(Bst root)
 {
-  return 0;
+  if (root == 0)return 0;
+  return root->right;
+
 }
 
 
