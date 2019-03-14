@@ -19,6 +19,10 @@ typedef struct Node* Bst;
 *** Initializes the binary search tree. Deletes all existing nodes in the tree
 *** @return The number of deleted nodes
 */
+
+bool have_equal_nodes(int* elements, int* elements2, int length);
+Node* new_node (int value);
+
 Bst new_bst();
 
 void delete_bst(Bst bst);

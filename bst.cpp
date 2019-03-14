@@ -14,11 +14,10 @@
 #include <stdlib.h>
 #include "general.h"
 
-struct Node
-{
+struct Node {
   int value;
-  struct Node* right;
   struct Node* left;
+  struct Node* right;
 };
 
 Bst new_bst()
@@ -28,20 +27,14 @@ Bst new_bst()
 
 void delete_bst(Bst bst)
 {
-  if(bst != 0)
+  if (bst == 0)
   {
-    if (bst->left != 0)
-    {
-      sfree(bst->left);
-    }
-    if (bst->right != 0)
-    {
-      sfree(bst->right);
-    }
-    sfree(bst);
+    return;
   }
+  delete_bst(bst->left);
+  delete_bst(bst->right);
+  sfree(bst);
 }
-
 
 int get_depth(Bst bst)
 {
@@ -66,84 +59,157 @@ int get_depth(Bst bst)
 }
 
 
+
 void add(Bst* bst, int value)
 {
-  Bst new_node = (Bst)malloc(sizeof(struct Node));
-  new_node->value = value;
-  new_node->left = 0;
-  new_node->right = 0;
-  if (*bst == 0)
+  if ((*bst) == 0)
   {
-    *bst = new_node;
+    Node* newnode = new_node(value);
+    (*bst) = newnode;
     return;
   }
   if (value <= (*bst)->value)
   {
-    (*bst)->left = new_node;
+    if ((*bst)->left == 0)
+    {
+      Node* newnode = new_node(value);
+      (*bst)->left = newnode;
+    }
+    else
+    {
+      Node* bst_to_add = (*bst)->left;
+      add(&bst_to_add, value);
+    }
   }
   else
   {
-    (*bst)->right = new_node;
+    if ((*bst)->right == 0)
+    {
+      Node* newnode = new_node(value);
+      (*bst)->right = newnode;
+    }
+    else
+    {
+      Node* bst_to_add = (*bst)->right;
+      add(&bst_to_add, value);
+    }
   }
+}
 
-
-
+Node* new_node (int value)
+{
+  Node* newnode = (struct Node*)malloc(sizeof(struct Node));
+  newnode->value = value;
+  newnode->left = 0;
+  newnode->right = 0;
+  return newnode;
 }
 
 int root_value(Bst bst)
 {
-  if (bst == 0 )return 0;
+  if (bst == 0)
+  {
+    return 0;
+  }
   return bst->value;
 }
 
 Bst left_subtree(Bst root)
 {
-  if (root == 0)return 0;
+  if (root == 0)
+  {
+    return 0;
+  }
   return root->left;
 }
 
 Bst right_subtree(Bst root)
 {
-  if (root == 0)return 0;
+  if (root == 0)
+  {
+    return 0;
+  }
   return root->right;
-
 }
-
 
 int traverse_pre_order(Bst bst, int *elements, int start)
 {
-  return 0;
+  if(bst == 0) return start;
+  elements[start] = bst->value;
+  start++;
+  start = traverse_pre_order(bst->left, elements, start);
+  start = traverse_pre_order(bst->right, elements, start);
+  return start;
 }
-
-
 
 int traverse_in_order(Bst bst, int *elements, int start)
 {
-  return 0;
+  if(bst == 0) return start;
+  start = traverse_in_order(bst->left, elements, start);
+  elements[start] = bst->value;
+  start++;
+  start = traverse_in_order(bst->right, elements, start);
+  return start;
 }
-
 
 
 int traverse_post_order(Bst bst, int *elements, int start)
 {
-  return 0;
+  if (bst == 0) return start;
+  start = traverse_post_order(bst->left, elements, start);
+  start = traverse_post_order(bst->right, elements, start);
+  elements[start] = bst->value;
+  start++;
+  return start;
 }
+
 
 
 bool are_equal(Bst bst1, Bst bst2)
 {
+  if (bst1 == 0 && bst1 == 0) return true;
+  if (get_depth(bst1) == get_depth(bst2))
+  {
+    int *elements = new int[get_depth(bst1)];
+    traverse_pre_order(bst1,elements, 0);
+    int *elements2 = new int[get_depth(bst2)];
+    traverse_pre_order(bst2,elements2, 0);
+    return (bst1->value == bst2->value && have_equal_nodes(elements,elements2,get_depth(bst1)));
+  }
   return false;
 }
 
-
+bool have_equal_nodes(int* elements, int* elements2, int length)
+{
+  for (int i = 0; i < length+1; i++)
+  {
+    if (elements[i] != elements2[i])
+    {
+      return false;
+    }
+  }
+  return true;
+}
 
 void most_left_longest_branch(Bst bst, Bst* branch)
 {
+  if(bst == 0) return;
 
+  if(get_depth(bst->right) > get_depth(bst->left))
+  {
+    add(branch, bst->value);
+    most_left_longest_branch(&(*bst->right), branch);
+  }
+  else if(get_depth(bst->right) <= get_depth(bst->left))
+  {
+    add(branch, bst->value);
+    most_left_longest_branch(&(*bst->left), branch);
+  }
 }
-
 
 int get_number_of_subtrees(Bst bst)
 {
-  return 0;
+  if (bst == 0) return -1;
+  int *elements = new int[get_depth(bst)];
+  return traverse_pre_order(bst, elements, 0)-1;
 }
